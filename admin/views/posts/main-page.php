@@ -160,6 +160,9 @@
         // Disabling button view
         buttonDoConvertPost.attr("disabled", "disabled");
 
+        model.title = inputTitle.val();
+        model.createdAt = inputCreatedAt.val();
+
         model.body = inputBody.val();
 
         // If the textarea is an ACE Editor
