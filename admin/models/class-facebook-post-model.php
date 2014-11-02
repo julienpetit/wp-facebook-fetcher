@@ -46,23 +46,38 @@ class FacebookPostModel
 
     public function getImagesUrlsFromPost($aid) {
 
+        $access_token = self::$facebook->getAccessToken();
+        // Get the attachments
+
+        $response = json_decode(file_get_contents("https://graph.facebook.com/v2.2/$aid?access_token=$access_token&fields=attachments"));
+
+
         $images = array();
 
-        $data = self::$facebook->api(array(
+        if(isset($response->attachments)) {
+            foreach ($response->attachments->data[0]->subattachments->data as $key => $value) {
+//                print_r($value);
+
+                $images[] = $value->media->image->src;
+            }
+        }
+
+
+        /* $data = self::$facebook->api(array(
             'method' => 'fql.query',
             'query' => "SELECT attachment FROM stream WHERE post_id='$aid'",
             ));
 
-
         foreach ($data[0]['attachment']['media']  as $key => $value) {
             // print_r_html($value);
             // 536632726462294
+            print_r($value);
 
             $test = self::$facebook->api("/".$value['photo']['fbid']);
             // print_r_html($test);
 
             $images[] = $test['images'][0]['source'];
-        }
+        } */
 
         return $images;
     }
@@ -105,6 +120,7 @@ class FacebookPostModel
 
         // If the page doesn't already exist, then create it
         if( null == get_page_by_title( $title ) ) {
+
 
             // Set the post ID so that we know the post was created successfully
             $post_id = wp_insert_post(
